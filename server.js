@@ -24,8 +24,7 @@ app.use(cors({
 
 // Allow iframe embedding from your WordPress site
 app.use((req, res, next) => {
-    res.setHeader('X-Frame-Options', 'ALLOWALL');
-    res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://startbizzindia.com http://startbizzindia.com https://www.startbizzindia.com http://www.startbizzindia.com");
+    res.removeHeader('X-Frame-Options');
     next();
 });
 
