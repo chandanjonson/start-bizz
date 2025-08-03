@@ -9,6 +9,17 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// IMPORTANT: Allow iframe embedding - must be FIRST middleware
+app.use((req, res, next) => {
+    // Remove any existing frame options
+    res.removeHeader('X-Frame-Options');
+    // Allow embedding from any origin
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
+    // Alternative CSP header for modern browsers  
+    res.setHeader('Content-Security-Policy', 'frame-ancestors *');
+    next();
+});
+
 // Middleware
 app.use(cors({
     origin: [
@@ -22,11 +33,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Allow iframe embedding from your WordPress site
-app.use((req, res, next) => {
-    res.removeHeader('X-Frame-Options');
-    next();
-});
+
 
 app.use(express.json());
 app.use(express.static('public'));
