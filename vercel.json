@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/server.js"
+    }
+  ],
+  "env": {
+    "AZURE_STORAGE_ACCOUNT_NAME": "@azure_storage_account_name",
+    "AZURE_STORAGE_ACCOUNT_KEY": "@azure_storage_account_key",
+    "AZURE_DATA_LAKE_CONTAINER": "@azure_data_lake_container"
+  }
+}
