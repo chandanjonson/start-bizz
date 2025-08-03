@@ -1,0 +1,276 @@
+.data-lake-container {
+    max-width: 800px;
+    margin: 20px auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.upload-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.upload-header h3 {
+    color: #333;
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.upload-header p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+.upload-area {
+    border: 3px dashed #0073aa;
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f9f9f9;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.upload-area:hover {
+    border-color: #005a87;
+    background: #f0f8ff;
+}
+
+.upload-area.dragover {
+    border-color: #005a87;
+    background: #e6f3ff;
+    transform: scale(1.02);
+}
+
+.upload-content {
+    pointer-events: none;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+}
+
+.upload-area h4 {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: #0073aa;
+}
+
+.upload-area p {
+    color: #666;
+    font-size: 1rem;
+}
+
+#fileInput {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-info {
+    background: #f0f8ff;
+    border: 1px solid #0073aa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.file-info h4 {
+    margin-bottom: 15px;
+    color: #0073aa;
+}
+
+#fileList {
+    list-style: none;
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+#fileList li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#fileList li:last-child {
+    border-bottom: none;
+}
+
+.file-size {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.upload-btn, .refresh-btn {
+    background: #0073aa;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.upload-btn:hover, .refresh-btn:hover {
+    background: #005a87;
+}
+
+.progress-section {
+    margin-bottom: 20px;
+}
+
+.progress-section h4 {
+    margin-bottom: 15px;
+    color: #0073aa;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #0073aa;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#progressText {
+    text-align: center;
+    font-weight: 600;
+    color: #0073aa;
+}
+
+.results-section {
+    margin-bottom: 20px;
+}
+
+.results-section h4 {
+    margin-bottom: 15px;
+    color: #0073aa;
+}
+
+.result-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #46b450;
+    background: #f7fff7;
+}
+
+.result-item.error {
+    border-left-color: #dc3232;
+    background: #fff7f7;
+}
+
+.result-item h5 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.result-item p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.files-section h4 {
+    margin-bottom: 15px;
+    color: #0073aa;
+    display: inline-block;
+}
+
+.refresh-btn {
+    float: right;
+    padding: 6px 15px;
+    font-size: 0.9rem;
+}
+
+.files-list {
+    clear: both;
+    margin-top: 15px;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    border-radius: 5px;
+    border-left: 4px solid #0073aa;
+}
+
+.file-item-info h5 {
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.file-item-info p {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.file-item-meta {
+    text-align: right;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+
+.error-message {
+    background: #fff7f7;
+    border: 1px solid #ffcccc;
+    border-left: 4px solid #dc3232;
+    padding: 15px;
+    border-radius: 5px;
+    color: #721c24;
+    margin: 15px 0;
+}
+
+@media (max-width: 768px) {
+    .data-lake-container {
+        margin: 10px;
+    }
+    
+    .upload-area {
+        padding: 30px 15px;
+    }
+    
+    .file-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .file-item-meta {
+        text-align: left;
+        margin-top: 10px;
+    }
+    
+    .refresh-btn {
+        float: none;
+        display: block;
+        margin-top: 10px;
+    }
+}
