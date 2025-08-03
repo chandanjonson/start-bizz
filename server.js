@@ -21,6 +21,14 @@ app.use(cors({
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Allow iframe embedding from your WordPress site
+app.use((req, res, next) => {
+    res.setHeader('X-Frame-Options', 'ALLOWALL');
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://startbizzindia.com http://startbizzindia.com https://www.startbizzindia.com http://www.startbizzindia.com");
+    next();
+});
+
 app.use(express.json());
 app.use(express.static('public'));
 
