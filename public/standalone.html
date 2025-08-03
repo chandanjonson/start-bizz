@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Lake File Uploader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        main {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 20px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-area h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        #fileInput {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .upload-btn, .refresh-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .upload-btn:hover, .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            background: #f8fff9;
+        }
+
+        .result-item.error {
+            border-left-color: #dc3545;
+            background: #fff8f8;
+        }
+
+        .files-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        #fileList {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        #fileList li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📁 Data Lake File Uploader</h1>
+            <p>Upload documents and images to Microsoft Data Lake</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📤</div>
+                        <h3>Drag & Drop Files Here</h3>
+                        <p>or click to browse</p>
+                        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif,.webp" multiple>
+                    </div>
+                </div>
+                
+                <div class="file-info" id="fileInfo" style="display: none;">
+                    <h4>Selected Files:</h4>
+                    <ul id="fileList"></ul>
+                    <button id="uploadBtn" class="upload-btn">Upload Files</button>
+                </div>
+            </section>
+
+            <section class="progress-section" id="progressSection" style="display: none;">
+                <h3>Upload Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p id="progressText">0%</p>
+            </section>
+
+            <section class="results-section" id="resultsSection" style="display: none;">
+                <h3>Upload Results</h3>
+                <div id="results"></div>
+            </section>
+
+            <section class="files-section">
+                <h3>Uploaded Files</h3>
+                <button id="refreshBtn" class="refresh-btn">🔄 Refresh List</button>
+                <div id="filesList" class="files-list">
+                    <p>Loading files...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        class FileUploader {
+            constructor() {
+                this.initializeElements();
+                this.attachEventListeners();
+                this.loadFilesList();
+            }
+
+            initializeElements() {
+                this.uploadArea = document.getElementById('uploadArea');
+                this.fileInput = document.getElementById('fileInput');
+                this.fileInfo = document.getElementById('fileInfo');
+                this.fileList = document.getElementById('fileList');
+                this.uploadBtn = document.getElementById('uploadBtn');
+                this.progressSection = document.getElementById('progressSection');
+                this.progressFill = document.getElementById('progressFill');
+                this.progressText = document.getElementById('progressText');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.results = document.getElementById('results');
+                this.filesList = document.getElementById('filesList');
+                this.refreshBtn = document.getElementById('refreshBtn');
+                
+                this.selectedFiles = [];
+            }
+
+            attachEventListeners() {
+                this.fileInput.addEventListener('change', (e) => {
+                    this.handleFileSelection(e.target.files);
+                });
+
+                this.uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.style.borderColor = '#764ba2';
+                });
+
+                this.uploadArea.addEventListener('dragleave', () => {
+                    this.uploadArea.style.borderColor = '#667eea';
+                });
+
+                this.uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    this.uploadArea.style.borderColor = '#667eea';
+                    this.handleFileSelection(e.dataTransfer.files);
+                });
+
+                this.uploadBtn.addEventListener('click', () => {
+                    this.uploadFiles();
+                });
+
+                this.refreshBtn.addEventListener('click', () => {
+                    this.loadFilesList();
+                });
+            }
+
+            handleFileSelection(files) {
+                this.selectedFiles = Array.from(files);
+                this.displaySelectedFiles();
+            }
+
+            displaySelectedFiles() {
+                if (this.selectedFiles.length === 0) {
+                    this.fileInfo.style.display = 'none';
+                    return;
+                }
+
+                this.fileList.innerHTML = '';
+                this.selectedFiles.forEach(file => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <span>${file.name}</span>
+                        <span>${this.formatFileSize(file.size)}</span>
+                    `;
+                    this.fileList.appendChild(li);
+                });
+
+                this.fileInfo.style.display = 'block';
+            }
+
+            async uploadFiles() {
+                if (this.selectedFiles.length === 0) return;
+
+                this.progressSection.style.display = 'block';
+                this.resultsSection.style.display = 'block';
+                this.results.innerHTML = '';
+
+                const totalFiles = this.selectedFiles.length;
+                let completedFiles = 0;
+
+                for (const file of this.selectedFiles) {
+                    try {
+                        const result = await this.uploadSingleFile(file);
+                        this.displayResult(file.name, result, false);
+                    } catch (error) {
+                        this.displayResult(file.name, { error: error.message }, true);
+                    }
+
+                    completedFiles++;
+                    const progress = (completedFiles / totalFiles) * 100;
+                    this.updateProgress(progress);
+                }
+
+                setTimeout(() => {
+                    this.resetForm();
+                    this.loadFilesList();
+                }, 2000);
+            }
+
+            async uploadSingleFile(file) {
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Upload failed');
+                }
+
+                return await response.json();
+            }
+
+            displayResult(fileName, result, isError) {
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `result-item ${isError ? 'error' : ''}`;
+                
+                if (isError) {
+                    resultDiv.innerHTML = `
+                        <h4>❌ ${fileName}</h4>
+                        <p>Error: ${result.error}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h4>✅ ${fileName}</h4>
+                        <p>Uploaded successfully to: ${result.filePath}</p>
+                        <p>Size: ${this.formatFileSize(result.size)}</p>
+                    `;
+                }
+
+                this.results.appendChild(resultDiv);
+            }
+
+            updateProgress(percentage) {
+                this.progressFill.style.width = `${percentage}%`;
+                this.progressText.textContent = `${Math.round(percentage)}%`;
+            }
+
+            resetForm() {
+                this.selectedFiles = [];
+                this.fileInput.value = '';
+                this.fileInfo.style.display = 'none';
+                this.progressSection.style.display = 'none';
+                this.updateProgress(0);
+            }
+
+            async loadFilesList() {
+                this.filesList.innerHTML = '<div>Loading files...</div>';
+
+                try {
+                    const response = await fetch('/files');
+                    if (!response.ok) {
+                        throw new Error('Failed to load files');
+                    }
+
+                    const data = await response.json();
+                    this.displayFilesList(data.files);
+                } catch (error) {
+                    this.filesList.innerHTML = `<div>Failed to load files: ${error.message}</div>`;
+                }
+            }
+
+            displayFilesList(files) {
+                if (files.length === 0) {
+                    this.filesList.innerHTML = '<p>No files uploaded yet.</p>';
+                    return;
+                }
+
+                this.filesList.innerHTML = '';
+                files.forEach(file => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.className = 'file-item';
+                    
+                    const fileName = file.name.split('/').pop();
+                    const uploadDate = new Date(file.lastModified).toLocaleString();
+                    
+                    fileDiv.innerHTML = `
+                        <div>
+                            <h4>📄 ${fileName}</h4>
+                            <p>Path: ${file.name}</p>
+                        </div>
+                        <div>
+                            <p>Size: ${this.formatFileSize(file.size)}</p>
+                            <p>Uploaded: ${uploadDate}</p>
+                        </div>
+                    `;
+                    
+                    this.filesList.appendChild(fileDiv);
+                });
+            }
+
+            formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new FileUploader();
+        });
+    </script>
+</body>
+</html>

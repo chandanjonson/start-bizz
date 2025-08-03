@@ -240,9 +240,14 @@ app.get('/public/*', (req, res) => {
     res.sendFile(filePath);
 });
 
+// Serve the standalone version (with embedded CSS/JS)
+app.get('/standalone', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'standalone.html'));
+});
+
 // Serve the main page
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'standalone.html'));
 });
 
 app.listen(PORT, () => {
