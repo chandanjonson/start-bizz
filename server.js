@@ -240,6 +240,57 @@ app.get('/public/*', (req, res) => {
     res.sendFile(filePath);
 });
 
+// Simple test page
+app.get('/simple', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Simple Upload Test</title></head>
+        <body style="font-family: Arial; padding: 20px; background: #f0f8ff;">
+            <h1>🔧 Upload Test</h1>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="fileInput" accept="image/*" style="margin: 10px;">
+                <button type="button" onclick="uploadFile()" style="padding: 10px; background: #007cba; color: white; border: none;">Upload</button>
+            </form>
+            <div id="result" style="margin-top: 20px;"></div>
+            
+            <script>
+                async function uploadFile() {
+                    const fileInput = document.getElementById('fileInput');
+                    const result = document.getElementById('result');
+                    
+                    if (!fileInput.files[0]) {
+                        result.innerHTML = '❌ Please select a file';
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+                    
+                    try {
+                        result.innerHTML = '⏳ Uploading...';
+                        const response = await fetch('/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            result.innerHTML = '✅ Upload successful: ' + data.fileName;
+                        } else {
+                            result.innerHTML = '❌ Upload failed: ' + data.error;
+                        }
+                    } catch (error) {
+                        result.innerHTML = '❌ Error: ' + error.message;
+                    }
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
 // Serve the standalone version (with embedded CSS/JS)
 app.get('/standalone', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'standalone.html'));
