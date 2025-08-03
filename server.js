@@ -87,7 +87,15 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         }
 
         if (!dataLakeServiceClient) {
-            return res.status(500).json({ error: 'Azure Data Lake not configured' });
+            const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+            const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+            return res.status(500).json({
+                error: 'Azure Data Lake not configured',
+                details: {
+                    accountName: accountName ? 'Set' : 'Missing',
+                    accountKey: accountKey ? 'Set' : 'Missing'
+                }
+            });
         }
 
         const containerName = process.env.AZURE_DATA_LAKE_CONTAINER || 'uploads';
@@ -197,13 +205,39 @@ app.get('/files', async (req, res) => {
     }
 });
 
-// Serve static files explicitly
+// Serve static files explicitly with proper headers
 app.get('/styles.css', (req, res) => {
+    res.setHeader('Content-Type', 'text/css');
     res.sendFile(path.join(__dirname, 'public', 'styles.css'));
 });
 
 app.get('/script.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
     res.sendFile(path.join(__dirname, 'public', 'script.js'));
+});
+
+// Test endpoint to check Azure connection
+app.get('/test', (req, res) => {
+    const accountName = process.env.AZURE_STORAGE_ACCOUNT_NAME;
+    const accountKey = process.env.AZURE_STORAGE_ACCOUNT_KEY;
+    const container = process.env.AZURE_DATA_LAKE_CONTAINER;
+
+    res.json({
+        status: 'Server is running',
+        azure: {
+            accountName: accountName ? 'Set' : 'Missing',
+            accountKey: accountKey ? 'Set' : 'Missing',
+            container: container || 'uploads',
+            dataLakeClient: dataLakeServiceClient ? 'Initialized' : 'Not initialized'
+        },
+        uploadedFiles: uploadedFiles.length
+    });
+});
+
+// Handle any other static files
+app.get('/public/*', (req, res) => {
+    const filePath = path.join(__dirname, req.path);
+    res.sendFile(filePath);
 });
 
 // Serve the main page
